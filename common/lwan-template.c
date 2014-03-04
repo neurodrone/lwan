@@ -69,7 +69,6 @@ struct lwan_tpl_chunk_t_ {
 struct lwan_tpl_t_ {
     struct list_head chunks;
     size_t minimum_size;
-    int fd;
 };
 
 struct symtab {
@@ -352,10 +351,6 @@ lwan_tpl_free(lwan_tpl_t *tpl)
     if (!tpl)
         return;
 
-    if (tpl->fd) {
-        close(tpl->fd);
-    }
-
     lwan_tpl_chunk_t *chunk;
     lwan_tpl_chunk_t *next;
     list_for_each_safe(&tpl->chunks, chunk, next, list) {
@@ -558,7 +553,6 @@ lwan_tpl_compile_file(const char *filename, const lwan_var_descriptor_t *descrip
         goto close_file;
 
     tpl = lwan_tpl_compile_string(mapped, descriptor);
-    tpl->fd = fd;
 
     if (munmap(mapped, st.st_size) < 0)
         lwan_status_perror("munmap");
